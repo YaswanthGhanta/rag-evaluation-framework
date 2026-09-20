@@ -4,7 +4,7 @@ An end-to-end **Retrieval-Augmented Generation (RAG) evaluation project** focuse
 
 The project goes beyond building a RAG pipeline. It evaluates individual components of the system—including **retrieval, context sufficiency, groundedness, retry behavior, answer relevance, and completeness**—and investigates how failures propagate across the pipeline.
 
-A major focus of the project is also **evaluator reliability**: testing whether LLM-based judges remain accurate and stable across boundary cases, repeated runs, and small context variations.
+A major focus is also **evaluator reliability**: testing whether LLM-based judges remain accurate and stable across boundary cases, repeated runs, and small context variations.
 
 ---
 
@@ -107,7 +107,7 @@ The system classifies context as:
 SUFFICIENT
 ```
 
-or
+or:
 
 ```text
 INSUFFICIENT
@@ -133,7 +133,7 @@ For evaluation purposes, **INSUFFICIENT** was treated as the positive class beca
 
 ## Sufficiency Metrics
 
-Final 31-case evaluation:
+In the documented 31-case benchmark run:
 
 | Metric                         | Result |
 | ------------------------------ | -----: |
@@ -142,7 +142,9 @@ Final 31-case evaluation:
 | Insufficient-Context Recall    |   100% |
 | False Negatives                |      0 |
 
-The confusion matrix was also tracked explicitly rather than relying only on aggregate accuracy.
+The confusion matrix was tracked explicitly rather than relying only on aggregate accuracy.
+
+Because sufficiency is evaluated using an LLM judge, repeated runs showed variability on semantic boundary cases. Judge stability and regression behavior were therefore evaluated separately rather than assuming a single run represented deterministic performance.
 
 ---
 
@@ -170,8 +172,6 @@ This demonstrated that a single evaluation result can hide **judge instability**
 ## Boundary and Adversarial Evaluation
 
 The evaluation dataset intentionally included cases designed to expose weaknesses that normal questions may not reveal.
-
-Examples included:
 
 ### Material Conditions
 
@@ -243,7 +243,7 @@ The retry generator is instructed to remain tightly constrained to the retrieved
 
 The regenerated answer is then evaluated again before being accepted.
 
-Final evaluation:
+In the documented benchmark run:
 
 | Metric                  | Result |
 | ----------------------- | -----: |
@@ -259,7 +259,7 @@ This allows groundedness failures to be measured separately from the effectivene
 
 Groundedness alone does not guarantee that an answer is useful.
 
-The project therefore evaluates two additional dimensions:
+The project therefore evaluates two additional dimensions.
 
 ### Relevance
 
@@ -295,7 +295,7 @@ This separation prevents different failure types from being collapsed into a sin
 
 ## Final End-to-End Evaluation
 
-The final benchmark contained **31 evaluation cases** across multiple slices.
+The documented benchmark contained **31 evaluation cases** across multiple slices.
 
 | Metric                         | Result |
 | ------------------------------ | -----: |
@@ -308,6 +308,8 @@ The final benchmark contained **31 evaluation cases** across multiple slices.
 | Answer Completeness            |   100% |
 | Insufficient-Context Precision | 93.75% |
 | Insufficient-Context Recall    |   100% |
+
+These values represent a documented benchmark run rather than a claim of deterministic performance across every repeated LLM-judge execution.
 
 ### Slice Analysis
 
@@ -325,7 +327,7 @@ The final benchmark contained **31 evaluation cases** across multiple slices.
 
 The low retrieval accuracy on out-of-scope questions reflects the behavior of nearest-neighbor retrieval: a candidate can still be returned when no correct policy exists.
 
-The sufficiency layer successfully blocked those cases in the final evaluation.
+The sufficiency layer successfully blocked those cases in the documented benchmark run.
 
 ---
 
@@ -342,6 +344,8 @@ Those regressions were treated as evidence against the modification.
 This led to an important evaluation principle used throughout the project:
 
 > Optimize system-level behavior, not individual test cases.
+
+The project also used repeated evaluation and restoration of earlier code states to distinguish actual code regressions from variability introduced by LLM-based judges.
 
 ---
 
@@ -377,4 +381,92 @@ When evidence is insufficient, refusing to generate can be more reliable than fo
 
 ---
 
-## Skill
+## Skills Demonstrated
+
+* RAG evaluation and failure analysis
+* LLM response evaluation
+* Semantic retrieval and embedding-based search
+* Cosine similarity and top-k retrieval
+* CrossEncoder reranking
+* Retrieval diagnostics and holdout testing
+* Context sufficiency evaluation
+* Groundedness and hallucination analysis
+* LLM-as-a-judge evaluation
+* Answer relevance and completeness evaluation
+* Confusion matrices, precision, recall, and accuracy
+* Slice-based evaluation
+* Boundary and adversarial test design
+* LLM judge stability testing
+* Context perturbation testing
+* Regression testing
+* Prompt and evaluation-rubric refinement
+* Safe abstention for insufficient context
+* Retry and recovery evaluation
+* Python-based evaluation pipelines
+
+---
+
+## Technology Stack
+
+* Python
+* SentenceTransformers
+* `all-MiniLM-L6-v2`
+* CrossEncoder
+* `cross-encoder/ms-marco-MiniLM-L6-v2`
+* scikit-learn
+* NumPy
+* Groq API
+* LLM-based evaluation
+* VS Code
+
+---
+
+## Repository Structure
+
+Key files include:
+
+| File                            | Purpose                                  |
+| ------------------------------- | ---------------------------------------- |
+| `rag_pipeline.py`               | End-to-end RAG pipeline orchestration    |
+| `semantic_retriever.py`         | Embedding-based semantic retrieval       |
+| `reranker.py`                   | CrossEncoder reranking                   |
+| `context_judge.py`              | Context sufficiency evaluation           |
+| `generator.py`                  | Context-based answer generation          |
+| `strict_generator.py`           | Stricter retry generation                |
+| `groundedness_judge.py`         | Groundedness evaluation                  |
+| `answer_quality_judge.py`       | Relevance and completeness evaluation    |
+| `evaluation_data.py`            | Evaluation dataset and expected outcomes |
+| `evaluation_runner1.py`         | End-to-end evaluation harness            |
+| `retrieval_diagnostics.py`      | Retrieval failure analysis               |
+| `retrieval_holdout.py`          | Holdout retrieval testing                |
+| `sufficiency_stability_test.py` | Repeated judge stability evaluation      |
+| `sufficiency_boundary_test.py`  | Sufficiency boundary-case testing        |
+| `sufficiency_rubric_test.py`    | Judge rubric and regression evaluation   |
+
+Additional scripts contain focused experiments and diagnostics used during development.
+
+---
+
+## Limitations
+
+This is a controlled personal evaluation project using a small synthetic HR policy knowledge base and a limited evaluation dataset.
+
+The reported metrics represent performance on this project's test suite and **should not be interpreted as production-level or general RAG performance guarantees**.
+
+The project also identified run-to-run variability in LLM-based sufficiency judgments, particularly around semantic boundary cases. For that reason, evaluator stability and regression behavior are treated as part of the evaluation problem itself.
+
+The project prioritizes evaluation methodology, failure analysis, and diagnostic reasoning over maximizing a single benchmark score.
+
+---
+
+## About the Project
+
+This project was developed as a practical exploration of **AI Evaluation, RAG Quality Assurance, and AI Trust Assurance**.
+
+The primary goal was not simply to maximize a benchmark score, but to understand:
+
+* where RAG systems fail,
+* how those failures can be measured,
+* whether evaluation mechanisms themselves are reliable,
+* how failures propagate across pipeline stages,
+* and how safeguards behave under difficult or ambiguous inputs.
