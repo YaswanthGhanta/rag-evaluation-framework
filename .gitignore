@@ -1,4 +1,20 @@
-.venv/
+# Environment variables / secrets
 .env
+.env.*
+!.env.example
+
+# Python virtual environments
+.venv/
+venv/
+
+# Python cache / compiled files
 __pycache__/
 *.pyc
+*.pyo
+
+# VS Code local settings
+.vscode/
+
+# OS-generated files
+.DS_Store
+Thumbs.db
